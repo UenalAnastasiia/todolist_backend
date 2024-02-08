@@ -1,6 +1,8 @@
 from django.shortcuts import render
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import TodoItemSerializer
@@ -23,10 +25,11 @@ class LoginView(ObtainAuthToken):
 
 
 class TodoItemView(APIView):
-    #authentication_classes = [authentication.TokenAuthentication]
-    permission_classes = []
+    # Nur angemeldete User können die todos sehen
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, format=None):
-        todos = TodoItem.objects.all()
+        todos = TodoItem.objects.filter(author=request.user)
         serializer = TodoItemSerializer(todos, many=True)
         return Response(serializer.data)
