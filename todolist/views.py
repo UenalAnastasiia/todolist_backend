@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
@@ -41,4 +42,17 @@ class TodoItemView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors)
+    
+    
+    def delete(self, request, pk, format=None):
+        todo = self.get_queryset(pk)
+        todo.delete()
+        return Response(status.HTTP_204_NO_CONTENT)
+
+
+    def get_queryset(self, pk):
+        try:
+            return TodoItem.objects.get(author=self.request.user, id=pk)
+        except TodoItem.DoesNotExist:
+            raise status.HTTP_404_NOT_FOUND
             
