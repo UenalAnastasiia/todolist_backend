@@ -55,4 +55,13 @@ class TodoItemView(APIView):
             return TodoItem.objects.get(author=self.request.user, id=pk)
         except TodoItem.DoesNotExist:
             raise status.HTTP_404_NOT_FOUND
+    
+    
+    def patch(self, request, pk):
+        todoItem_object = self.get_queryset(pk)
+        serializer = TodoItemSerializer(todoItem_object, data=request.data, partial=True) # set partial=True to update a data partially
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(status.HTTP_400_BAD_REQUEST)
             
