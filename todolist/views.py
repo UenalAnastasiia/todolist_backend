@@ -33,3 +33,12 @@ class TodoItemView(APIView):
         todos = TodoItem.objects.filter(author=request.user)
         serializer = TodoItemSerializer(todos, many=True)
         return Response(serializer.data)
+    
+    
+    def post(self, request, format=None):
+        serializer = TodoItemSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+            
